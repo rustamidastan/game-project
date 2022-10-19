@@ -27,10 +27,11 @@
       <h3>Shags:</h3>
       <div v-for="(shag, index) in shags" :key="shag">
         <button
-          :class="[this.defaultArr == this.shags[index] ? 'active' : '']"
+          :class="[this.defaultArr == this.shags[index + 1] ? 'active' : '']"
           @click="getShag(index)"
+          v-if="index < shags.length - 1"
         >
-          shag #{{ index }}
+          shag #{{ index + 1 }}
         </button>
       </div>
 
@@ -65,6 +66,28 @@ export default {
       win: "None",
       disable: false,
     };
+  },
+
+  mounted() {
+    if (JSON.parse(localStorage.getItem("defaultArr"))) {
+      this.defaultArr = JSON.parse(localStorage.getItem("defaultArr"));
+    }
+
+    if (JSON.parse(localStorage.getItem("activeArray"))) {
+      this.activeArray = JSON.parse(localStorage.getItem("activeArray"));
+    }
+
+    if (JSON.parse(localStorage.getItem("shags"))) {
+      this.shags = JSON.parse(localStorage.getItem("shags"));
+    }
+
+    if (localStorage.getItem("active")) {
+      this.active = localStorage.getItem("active");
+    }
+
+    if (localStorage.getItem("win")) {
+      this.win = localStorage.getItem("win");
+    }
   },
 
   methods: {
@@ -125,18 +148,24 @@ export default {
         }
         this.activeArray[x][y] = this.active;
         this.defaultArr = this.activeArray;
-        this.shags.push(JSON.parse(JSON.stringify(this.activeArray)));
+        this.shags.push(JSON.parse(localStorage.getItem("activeArray")));
         this.checkGame(this.activeArray);
         if (this.active == "X") {
           this.active = "O";
         } else {
           this.active = "X";
         }
+
+        localStorage.setItem("active", this.active);
+        localStorage.setItem("defaultArr", JSON.stringify(this.defaultArr));
+        localStorage.setItem("activeArray", JSON.stringify(this.activeArray));
+        localStorage.setItem("shags", JSON.stringify(this.shags));
+        localStorage.setItem("win", this.win);
       }
     },
 
     getShag(index) {
-      this.defaultArr = this.shags[index];
+      this.defaultArr = this.shags[index + 1];
       this.disable = true;
     },
 
@@ -161,6 +190,7 @@ export default {
       this.win = "None";
       this.disable = false;
       this.active = "X";
+      window.localStorage.clear();
     },
   },
 };
